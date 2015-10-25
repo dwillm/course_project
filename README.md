@@ -1,74 +1,73 @@
 Description
-This is the code book for the course project in the Getting and Cleaning Data class on Coursera. 
+This is the README file for the run_analysis.r file to explain how all of the scripts work and how they are connected.
+This project is for the  Getting and Cleaning Data class on Coursera. 
+The purpose of this project is to demonstrate the ability to collect, work with, and clean a data set. The goal is to prepare tidy data that can be used for later analysis.
 
 Source Data
-
-One of the most exciting areas in all of data science right now is wearable computing - see for example this article . Companies like Fitbit, Nike, and Jawbone Up are racing to develop the most advanced algorithms to attract new users. The data linked to from the course website represent data collected from the accelerometers from the Samsung Galaxy S smartphone. A full description is available at the site where the data was obtained: 
-
+A full description is available at the site where the data was obtained: 
 http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones 
 
 Here are the data for the project: 
-
 https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
 
-The purpose of this project is to demonstrate your ability to collect, work with, and clean a data set. The goal is to prepare tidy data that can be used for later analysis.
-
-You should create one R script called run_analysis.R that does the following. 
-Merges the training and the test sets to create one data set.
-Extracts only the measurements on the mean and standard deviation for each measurement. 
-Uses descriptive activity names to name the activities in the data set
-Appropriately labels the data set with descriptive variable names. 
-From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
-
- 
-
-Included in the above zip file is the supporting data about the data files in:
-features.txt
-activity_labels.txt
-
-Here are the actual data files that are read into tables:
-
-subject_train.txt
-x_train.txt
-y_train.txt
-subject_test.txt
-x_test.txt
-y_test.txt
-
+The run_analysis.R does the following:
 1. Merges the training and the test sets to create one data set.
-using rbind, these training and test tables are then merged into three varibles:
-subject <- rbind(subject_train, subject_test)
-activity <- rbind(y_train, y_test)
-feature <- rbind(X_train, X_test)
+2. Extracts only the measurements on the mean and standard deviation for each measurement. 
+3. Uses descriptive activity names to name the activities in the data set
+4. Appropriately labels the data set with descriptive variable names. 
+5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 
-These varibales are ultimately combiuned to create a complete dataset:
-data <- cbind(feature,activity,subject)
+Reads these data files into tables:
+   features.txt
+   activity_labels.txt
+   subject_train.txt
+   x_train.txt
+   y_train.txt
+   subject_test.txt
+   x_test.txt
+   y_test.txt
+
+1. Merges the training and the test sets to create these data sets:
+   subject <- rbind(subject_train, subject_test)
+   activity <- rbind(y_train, y_test)
+   feature <- rbind(X_train, X_test)
+
+These sets are combined to create a complete dataset:
+   data <- cbind(feature,activity,subject)
  
 2. Extracts only the measurements on the mean and standard deviation for each measurement. 
 
-Extract the mean or standard deviation into the meanstd variable:
-meanstd <- grep(".*Mean.*|.*Std.*", names(data), ignore.case=TRUE)
-add the extract to the column list
-meanstdcols <- c(meanstd, 562, 563)
-get the new extracted dataset in the dataext variable:
-dataext <- data[,meanstdcols]
+Extracts the mean or standard deviation into meanstd variable using the grep function:
+   meanstd <- grep(".*Mean.*|.*Std.*", names(data), ignore.case=TRUE)
+Add the extract to the column list
+   meanstdcols <- c(meanstd, 562, 563)
+Get the new extracted dataset as dataext:
+  dataext <- data[,meanstdcols]
 
 3. Uses descriptive activity names to name the activities in the data set
-Merge data subset with the activityType table to cinlude the descriptive activity names
+Merge dataext dataset with the activity table to include the descriptive activity names
 Change dataext variable to character to give descriptive names from the activity_labels table
-dataext$Activity <- as.character(dataext$Activity)
-for (i in 1:6){
-  dataext$Activity[dataext$Activity == i] <- as.character(activityLabels[i,2])
-}
-dataext$Activity <- as.factor(dataext$Activity)
-
-
+   dataext$Activity <- as.character(dataext$Activity)
+   for (i in 1:6){
+     dataext$Activity[dataext$Activity == i] <- as.character(activityLabels[i,2])
+   }
+   dataext$Activity <- as.factor(dataext$Activity)
 
 4. Appropriately labels the data set with descriptive variable names. 
-
-dataext is applied to the gsub function for pattern replacement to clean up the data labels
+The gsub function is applied to the dataext set for pattern replacement to clean up the data labels
+    names(dataext)<-gsub("Acc", "Accelerometer", names(dataext))
+    names(dataext)<-gsub("Gyro", "Gyroscope", names(dataext))
+    names(dataext)<-gsub("BodyBody", "Body", names(dataext))
+    names(dataext)<-gsub("Mag", "Magnitude", names(dataext))
+    names(dataext)<-gsub("^t", "Time", names(dataext))
+    names(dataext)<-gsub("^f", "Frequency", names(dataext))
+    names(dataext)<-gsub("tBody", "TimeBody", names(dataext))
+    names(dataext)<-gsub("-mean()", "Mean", names(dataext), ignore.case = TRUE)
+    names(dataext)<-gsub("-std()", "STD", names(dataext), ignore.case = TRUE)
+    names(dataext)<-gsub("-freq()", "Frequency", names(dataext), ignore.case = TRUE)
+    names(dataext)<-gsub("angle", "Angle", names(dataext))
+    names(dataext)<-gsub("gravity", "Gravity", names(dataext))
 
 Section 5. Create a second, independent tidy data set with the average of each variable for each activity and each subject.
-
-produce a tidy data set with the average for each activity and subject
-and extrat it to a tidydataset.txt file
+A tidy data set with the average for each activity and subject is extracted to a tidydataset.txt file
+    write.table(tidydataset, file = "tidydataset.txt", row.names = FALSE)
