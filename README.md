@@ -17,6 +17,8 @@ The run_analysis.R does the following:
 4. Appropriately labels the data set with descriptive variable names. 
 5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 
+Libraries used: library(data.table) and library(dplyr)
+
 Reads these data files into tables:
    features.txt
    activity_labels.txt
